@@ -75,7 +75,7 @@ namespace MapPlotter
 
         private void ResidencesListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (e.AddedItems[0] != null)
+            if (e.AddedItems.Count == 1 && e.AddedItems[0] != null)
             {
                 Residence item = e.AddedItems[0] as Residence;
                 if (item != null)

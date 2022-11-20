@@ -36,14 +36,21 @@
 
         <StackPanel Grid.Column="1" Grid.Row="1">
             <StackPanel Orientation="Horizontal">
-                <Label>X: </Label>
-                <Label Content="{Binding Latitude}" />
-            </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label>X:</Label>
+                    <Label Content="{Binding Latitude}" />
+                </StackPanel>
 
-            <StackPanel Orientation="Horizontal">
-                <Label>Y: </Label>
-                <Label Content="{Binding Longitude}" />
+                <StackPanel Orientation="Horizontal">
+                    <Label>Y:</Label>
+                    <Label Content="{Binding Longitude}" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label>Notes:</Label>
+                    <TextBox Width="400" Text="{Binding SelectedResidence.Notes}" />
+                </StackPanel>
             </StackPanel>
+          
             <StackPanel Orientation="Horizontal">
                 <Button x:Name="EditButton" Click="EditButton_Click" IsEnabled="{Binding CanEditResidence}">Edit</Button>
                 <Button x:Name="SaveButton" Click="SaveButton_Click" IsEnabled="{Binding IsEditMode}">Save</Button>
@@ -54,10 +61,11 @@
             <Label>List residences here</Label>
             <Button Command="{Binding LoadResidencesCommand}">Load Residences</Button>
             <Button Command="{Binding SaveResidencesCommand}" IsEnabled="{Binding ResidencesLoaded}">Save Residences</Button>
-
+            <TextBox Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}" />
+            
             <ListView 
                 x:Name="ResidencesListView"
-                ItemsSource="{Binding Residences}" 
+                ItemsSource="{Binding FilteredResidences}" 
                 MaxHeight="600"
                 SelectedItem="{Binding SelectedResidence}"
                 SelectionChanged="ResidencesListView_SelectionChanged"

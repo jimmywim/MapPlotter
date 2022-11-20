@@ -26,8 +26,40 @@ namespace MapPlotter.ViewModels
         public ObservableCollection<Pushpin> Pushpins { get => pins; set => SetProperty(ref pins, value); }
 
         private ObservableCollection<Residence> residences;
-        public ObservableCollection<Residence> Residences { get => residences; set => SetProperty(ref residences, value); }
+        public ObservableCollection<Residence> Residences
+        {
+            get => residences; set
+            {
+                SetProperty(ref residences, value);
+                OnPropertyChanged(nameof(FilteredResidences));
+            }
+        }
+
         public bool ResidencesLoaded => Residences.Any();
+
+        private string filterText;
+        public string FilterText
+        {
+            get => filterText;
+            set
+            {
+                SetProperty(ref filterText, value);
+
+                if (!string.IsNullOrEmpty(value))
+                {
+                    var filtered = Residences.Where(r => r.Address.ToLower().Contains(value.ToLower()));
+                    FilteredResidences = new ObservableCollection<Residence>(filtered);
+                }
+                else
+                {
+                    FilteredResidences = new ObservableCollection<Residence>(Residences);
+                }
+            }
+        }
+
+        private ObservableCollection<Residence> filteredResidences;
+        public ObservableCollection<Residence> FilteredResidences { get => filteredResidences; set => SetProperty(ref filteredResidences, value); }
+
 
         private Residence selectedResidence;
         public Residence SelectedResidence
@@ -122,6 +154,7 @@ namespace MapPlotter.ViewModels
                     ResidenceDataService residenceDataService = new ResidenceDataService(openFile.FileName);
                     var res = await residenceDataService.LoadResidences();
                     Residences = new ObservableCollection<Residence>(res);
+                    FilteredResidences = new ObservableCollection<Residence>(res);
 
                     OnPropertyChanged(nameof(ResidencesLoaded));
                 }

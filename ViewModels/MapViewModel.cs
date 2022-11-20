@@ -27,6 +27,25 @@ namespace MapPlotter.ViewModels
 
         private ObservableCollection<Residence> residences;
         public ObservableCollection<Residence> Residences { get => residences; set => SetProperty(ref residences, value); }
+        public bool ResidencesLoaded => Residences.Any();
+
+        private Residence selectedResidence;
+        public Residence SelectedResidence
+        {
+            get => selectedResidence;
+            set
+            {
+                SetProperty(ref selectedResidence, value);
+                OnPropertyChanged(nameof(CanEditResidence));
+            }
+        }
+        public bool CanEditResidence => SelectedResidence != null;
+
+        private bool isEditMode;
+        public bool IsEditMode { get => isEditMode; set => SetProperty(ref isEditMode, value); }
+
+        private Residence? editedResidence;
+        public Residence? EditedResidence { get => editedResidence; set => SetProperty(ref editedResidence, value); }
 
         private ICommand loadResidencesCommand;
         public ICommand LoadResidencesCommand
@@ -35,10 +54,24 @@ namespace MapPlotter.ViewModels
             {
                 if (loadResidencesCommand == null)
                 {
-                    loadResidencesCommand = new RelayCommand(LoadResidences);
+                    loadResidencesCommand = new AsyncRelayCommand(LoadResidences);
                 }
 
                 return loadResidencesCommand;
+            }
+        }
+
+        private ICommand saveResidencesCommand;
+        public ICommand SaveResidencesCommand
+        {
+            get
+            {
+                if (saveResidencesCommand == null)
+                {
+                    saveResidencesCommand = new AsyncRelayCommand(SaveResidences);
+                }
+
+                return saveResidencesCommand;
             }
         }
 
@@ -48,15 +81,64 @@ namespace MapPlotter.ViewModels
             Residences = new ObservableCollection<Residence>();
         }
 
-        private void LoadResidences()
+        public void EditResidence()
+        {
+            IsEditMode = true;
+            EditedResidence = SelectedResidence.Clone();
+        }
+
+        public void SaveEditedResidence()
+        {
+            if (EditedResidence != null)
+            {
+                var res = Residences.FirstOrDefault(r => r.PrimaryKey == EditedResidence.PrimaryKey);
+                if (res != null)
+                {
+                    res.Latitude = EditedResidence.Latitude;
+                    res.Longitude = EditedResidence.Longitude;
+                    res.IsDirty = true;
+
+                    EditedResidence = null;
+                    IsEditMode = false;
+
+                    OnPropertyChanged(nameof(SelectedResidence));
+                }
+            }
+        }
+
+        public void CancelEditResidence()
+        {
+            SelectedResidence.IsDirty = false;
+            EditedResidence = null;
+            IsEditMode = false;
+        }
+
+        private async Task LoadResidences()
         {
             OpenFileDialog openFile = new OpenFileDialog();
             {
                 if (openFile.ShowDialog() == true)
                 {
                     ResidenceDataService residenceDataService = new ResidenceDataService(openFile.FileName);
-                    Residences = new ObservableCollection<Residence>(residenceDataService.LoadResidences());
+                    var res = await residenceDataService.LoadResidences();
+                    Residences = new ObservableCollection<Residence>(res);
+
+                    OnPropertyChanged(nameof(ResidencesLoaded));
                 }
+            }
+        }
+
+        private async Task SaveResidences()
+        {
+            SaveFileDialog saveFile = new SaveFileDialog();
+            if (saveFile.ShowDialog() == true)
+            {
+                ResidenceDataService residenceDataService = new ResidenceDataService(saveFile.FileName);
+                var res = Residences.ToList();
+                await residenceDataService.SaveResidences(res);
+
+                res.ForEach(r => r.IsDirty = false);
+                Residences = new ObservableCollection<Residence>(res);
             }
         }
     }

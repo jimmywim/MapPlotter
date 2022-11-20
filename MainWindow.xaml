@@ -5,15 +5,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MapPlotter"
         xmlns:m="clr-namespace:Microsoft.Maps.MapControl.WPF;assembly=Microsoft.Maps.MapControl.WPF"
-        xmlns:vm="clr-namespace:MapPlotter.ViewModels"
+        xmlns:vm="clr-namespace:MapPlotter.ViewModels" xmlns:controls="clr-namespace:MapPlotter.Controls" xmlns:fa="http://schemas.fontawesome.io/icons/"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="750" Width="1200">
     <Window.DataContext>
         <vm:MapViewModel />
     </Window.DataContext>
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="200" />
+            <ColumnDefinition Width="300" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
@@ -25,19 +25,13 @@
                Grid.Column="1"
                CredentialsProvider="ArwKvTnZWuGMxz3SP0uwSUoEQQwRFHFWnUONaJhsaM_Eu_jxCV7p08To1gN3z1--"
                ZoomLevel="17"
-               MouseMove="myMap_MouseMove"
-               MouseLeftButtonUp="myMap_MouseLeftButtonUp"
+              
+               MouseLeftButtonDown="myMap_MouseLeftButtonDown"
                Mode="Aerial">
             <m:Map.Center>
                 <m:Location Latitude="55.94464" Longitude="-2.95421" />
             </m:Map.Center>
-            <m:MapItemsControl ItemsSource="{Binding Pushpins}">
-                <m:MapItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <m:Pushpin Location="{Binding position.location}"/>
-                    </DataTemplate>
-                </m:MapItemsControl.ItemTemplate>
-            </m:MapItemsControl>
+            <m:MapItemsControl ItemsSource="{Binding Pushpins}" />
         </m:Map>
 
         <StackPanel Grid.Column="1" Grid.Row="1">
@@ -50,11 +44,33 @@
                 <Label>Y: </Label>
                 <Label Content="{Binding Longitude}" />
             </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Button x:Name="EditButton" Click="EditButton_Click" IsEnabled="{Binding CanEditResidence}">Edit</Button>
+                <Button x:Name="SaveButton" Click="SaveButton_Click" IsEnabled="{Binding IsEditMode}">Save</Button>
+            </StackPanel>
         </StackPanel>
 
         <StackPanel Grid.Column="0" Grid.RowSpan="2">
             <Label>List residences here</Label>
             <Button Command="{Binding LoadResidencesCommand}">Load Residences</Button>
+            <Button Command="{Binding SaveResidencesCommand}" IsEnabled="{Binding ResidencesLoaded}">Save Residences</Button>
+
+            <ListView 
+                x:Name="ResidencesListView"
+                ItemsSource="{Binding Residences}" 
+                MaxHeight="600"
+                SelectedItem="{Binding SelectedResidence}"
+                SelectionChanged="ResidencesListView_SelectionChanged"
+                >
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <WrapPanel Orientation="Horizontal">
+                            <fa:ImageAwesome Icon="{Binding IconName}" Height="16" Width="16" VerticalAlignment="Center"/>
+                            <Label Content="{Binding Name}" />
+                        </WrapPanel>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
         </StackPanel>
     </Grid>
 </Window>

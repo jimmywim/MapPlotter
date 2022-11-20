@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace MapPlotter.Services
 {
@@ -18,14 +19,15 @@ namespace MapPlotter.Services
             filename = fileName;
         }
 
-        public List<Residence> LoadResidences()
+        public async Task<List<Residence>> LoadResidences()
         {
-            var residences = new List<Residence>(); 
+            var residences = new List<Residence>();
 
-            using (FileStream stream = File.OpenRead(filename))
-            using (ExcelPackage excelPackage = new ExcelPackage(stream))
+            using (ExcelPackage excelPackage = new ExcelPackage())
             {
+                await excelPackage.LoadAsync(filename);
                 var worksheet = excelPackage.Workbook.Worksheets.First();
+
                 var dataTable = worksheet.Cells["A:F"].ToDataTable(c =>
                 {
                     c.DataTableName = "Residences";
@@ -38,7 +40,7 @@ namespace MapPlotter.Services
                     c.Mappings.Add(5, "Notes", typeof(string), true);
                 });
 
-                foreach(DataRow row in dataTable.Rows)
+                foreach (DataRow row in dataTable.Rows)
                 {
                     Residence residence = new Residence
                     {
@@ -57,9 +59,31 @@ namespace MapPlotter.Services
             return residences;
         }
 
-        public void SaveResidences(List<Residence> residences)
+        public async Task SaveResidences(List<Residence> residences)
         {
+            using (ExcelPackage excelPackage = new ExcelPackage(new FileInfo(filename)))
+            {
+                var worksheet = excelPackage.Workbook.Worksheets.First();
+                var range = worksheet.Cells["A1:F700"];
+                var start = range.Start;
+                var end = range.End;
 
+                for (int row = start.Row; row <= end.Row; row++)
+                {
+                    // Row by row...
+                    var primaryKey = worksheet.Cells[row, 1].Text;
+                    var residence = residences.FirstOrDefault(r => r.PrimaryKey == primaryKey);
+
+                    if (residence != null)
+                    {
+                        worksheet.Cells[row, 4].Value = residence.Latitude;
+                        worksheet.Cells[row, 5].Value = residence.Longitude;
+                        worksheet.Cells[row, 6].Value = residence.Notes;
+                    }
+                }
+
+                await excelPackage.SaveAsync();
+            }
         }
     }
 }

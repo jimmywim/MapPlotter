@@ -7,7 +7,7 @@
         xmlns:m="clr-namespace:Microsoft.Maps.MapControl.WPF;assembly=Microsoft.Maps.MapControl.WPF"
         xmlns:vm="clr-namespace:MapPlotter.ViewModels" xmlns:controls="clr-namespace:MapPlotter.Controls" xmlns:fa="http://schemas.fontawesome.io/icons/"
         mc:Ignorable="d"
-        Title="MainWindow" Height="750" Width="1200">
+        Title="Tranent Census 1901 Map Plotter" Height="750" Width="1200">
     <Window.DataContext>
         <vm:MapViewModel />
     </Window.DataContext>

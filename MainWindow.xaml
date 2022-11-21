@@ -18,7 +18,7 @@
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
-            <RowDefinition Height="75" />
+            <RowDefinition Height="100" />
         </Grid.RowDefinitions>
 
         <m:Map x:Name="myMap"
@@ -36,24 +36,30 @@
 
         <StackPanel Grid.Column="1" Grid.Row="1">
             <StackPanel Orientation="Horizontal">
-                <StackPanel Orientation="Horizontal">
+                <StackPanel Orientation="Horizontal" Width="150">
                     <Label>X:</Label>
                     <Label Content="{Binding Latitude}" />
                 </StackPanel>
 
-                <StackPanel Orientation="Horizontal">
+                <StackPanel Orientation="Horizontal"  Width="150">
                     <Label>Y:</Label>
                     <Label Content="{Binding Longitude}" />
                 </StackPanel>
+                <StackPanel Orientation="Horizontal" Width="350">
+                    <Label>Name:</Label>
+                    <Label Content="{Binding SelectedResidence.Name}" />
+                </StackPanel>
+               
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
                 <StackPanel Orientation="Horizontal">
                     <Label>Notes:</Label>
                     <TextBox Width="400" Text="{Binding SelectedResidence.Notes}" />
                 </StackPanel>
             </StackPanel>
-          
-            <StackPanel Orientation="Horizontal">
-                <Button x:Name="EditButton" Click="EditButton_Click" IsEnabled="{Binding CanEditResidence}">Edit</Button>
-                <Button x:Name="SaveButton" Click="SaveButton_Click" IsEnabled="{Binding IsEditMode}">Save</Button>
+            <StackPanel Orientation="Horizontal" Margin="0 10">
+                <Button x:Name="EditButton" Padding="10 5" Margin="10 0" Click="EditButton_Click" IsEnabled="{Binding CanEditResidence}">Edit</Button>
+                <Button x:Name="SaveButton" Padding="10 5" Margin="10 0" Click="SaveButton_Click" IsEnabled="{Binding IsEditMode}">Save</Button>
             </StackPanel>
         </StackPanel>
 
@@ -62,7 +68,15 @@
             <Button Command="{Binding LoadResidencesCommand}">Load Residences</Button>
             <Button Command="{Binding SaveResidencesCommand}" IsEnabled="{Binding ResidencesLoaded}">Save Residences</Button>
             <TextBox Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}" />
-            
+            <CheckBox IsChecked="{Binding FilterUnassigned}">Has Location</CheckBox>
+
+            <StackPanel Orientation="Horizontal" >
+                <Label>Number in view: </Label>
+                <Label Content="{Binding NumberInView}" />
+                <Button Command="{Binding ShowAllCommand}" Padding="5">Show All</Button>
+                <Button x:Name="ShowAllOnMapButton" Click="ShowAllOnMapButton_Click" Padding="5" Margin="5 0">Show All On Map</Button>
+            </StackPanel>
+
             <ListView 
                 x:Name="ResidencesListView"
                 ItemsSource="{Binding FilteredResidences}" 

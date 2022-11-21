@@ -54,8 +54,26 @@ namespace MapPlotter.ViewModels
                 {
                     FilteredResidences = new ObservableCollection<Residence>(Residences);
                 }
+
+
+                OnPropertyChanged(nameof(NumberInView));
             }
         }
+
+        private bool filterUnassigned;
+        public bool FilterUnassigned
+        {
+            get => filterUnassigned;
+            set
+            {
+                var filtered = Residences.Where(r => r.HasGeo == value);
+                FilteredResidences = new ObservableCollection<Residence>(filtered);
+                SetProperty(ref filterUnassigned, value);
+                OnPropertyChanged(nameof(NumberInView));
+            }
+        }
+
+        public int NumberInView => FilteredResidences.Count;
 
         private ObservableCollection<Residence> filteredResidences;
         public ObservableCollection<Residence> FilteredResidences { get => filteredResidences; set => SetProperty(ref filteredResidences, value); }
@@ -107,10 +125,31 @@ namespace MapPlotter.ViewModels
             }
         }
 
+        private ICommand showAllCommand;
+        public ICommand ShowAllCommand
+        {
+            get
+            {
+                if (showAllCommand == null)
+                {
+                    showAllCommand = new RelayCommand(ShowAll);
+                }
+
+                return showAllCommand;
+            }
+        }
+
         public MapViewModel()
         {
             Pushpins = new ObservableCollection<Pushpin>();
             Residences = new ObservableCollection<Residence>();
+            FilteredResidences = new ObservableCollection<Residence>();
+        }
+
+        private void ShowAll()
+        {
+            FilteredResidences = new ObservableCollection<Residence>(Residences);
+            OnPropertyChanged(nameof(NumberInView));
         }
 
         public void EditResidence()
@@ -157,6 +196,7 @@ namespace MapPlotter.ViewModels
                     FilteredResidences = new ObservableCollection<Residence>(res);
 
                     OnPropertyChanged(nameof(ResidencesLoaded));
+                    OnPropertyChanged(nameof(NumberInView));
                 }
             }
         }

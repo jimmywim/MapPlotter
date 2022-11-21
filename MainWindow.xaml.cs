@@ -87,7 +87,7 @@ namespace MapPlotter
             }          
         }
 
-        private void CreatePushPin(Residence residence)
+        private void CreatePushPin(Residence residence, bool clearFirst = true)
         {
             if (residence.HasGeo)
             {
@@ -97,14 +97,26 @@ namespace MapPlotter
                 double lng = Double.Parse(residence.Longitude);
                 pin.Location = new Location(lat, lng);
 
-                DataModel.Pushpins.Clear();
+                pin.ToolTip = new ToolTip
+                {
+                    Content = residence.Name
+                };
+
+                if (clearFirst)
+                {
+                    DataModel.Pushpins.Clear();
+                }
+
                 DataModel.Pushpins.Add(pin);
 
                 myMap.Center = pin.Location;
             }
             else
             {
-                DataModel.Pushpins.Clear();
+                if (clearFirst)
+                {
+                    DataModel.Pushpins.Clear();
+                }
             }
         }
 
@@ -132,6 +144,14 @@ namespace MapPlotter
                 EditButton.Content = "Edit";
                 DataModel.SaveEditedResidence();
             }          
+        }
+
+        private void ShowAllOnMapButton_Click(object sender, RoutedEventArgs e)
+        {
+            foreach(var residence in DataModel.FilteredResidences)
+            {
+                CreatePushPin(residence, false);
+            }
         }
     }
 }

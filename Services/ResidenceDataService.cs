@@ -28,7 +28,7 @@ namespace MapPlotter.Services
                 await excelPackage.LoadAsync(filename);
                 var worksheet = excelPackage.Workbook.Worksheets.First();
 
-                var dataTable = worksheet.Cells["A:F"].ToDataTable(c =>
+                var dataTable = worksheet.Cells["A:K"].ToDataTable(c =>
                 {
                     c.DataTableName = "Residences";
                     c.ColumnNameParsingStrategy = OfficeOpenXml.Export.ToDataTable.NameParsingStrategy.RemoveSpace;
@@ -38,6 +38,11 @@ namespace MapPlotter.Services
                     c.Mappings.Add(3, "Latitude", typeof(string), true);
                     c.Mappings.Add(4, "Longitude", typeof(string), true);
                     c.Mappings.Add(5, "Notes", typeof(string), true);
+                    c.Mappings.Add(6, "VRNumber", typeof(string), true);
+                    c.Mappings.Add(7, "Description", typeof(string), true);
+                    c.Mappings.Add(8, "Proprietor", typeof(string), true);
+                    c.Mappings.Add(9, "Tenant", typeof(string), true);
+                    c.Mappings.Add(10, "Occupier", typeof(string), true);
                 });
 
                 foreach (DataRow row in dataTable.Rows)
@@ -50,6 +55,10 @@ namespace MapPlotter.Services
                         Longitude = row["Longitude"] as string,
                         Notes = row["Notes"] as string,
                         Number = row["Number"] as string,
+                        Description = row["Description"] as string,
+                        Proprietor = row["Proprietor"] as string,
+                        Tenant = row["Tenant"] as string,
+                        Occupier = row["Occupier"] as string
                     };
 
                     residences.Add(residence);

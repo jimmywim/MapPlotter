@@ -97,6 +97,11 @@ namespace MapPlotter
                 double lng = Double.Parse(residence.Longitude);
                 pin.Location = new Location(lat, lng);
 
+                if (residence.IsOwnerOccupier)
+                {
+                    pin.Background = new SolidColorBrush(Color.FromRgb(10, 17, 114));
+                }
+
                 pin.ToolTip = new ToolTip
                 {
                     Content = residence.Name

@@ -14,6 +14,10 @@ namespace MapPlotter.Models
         public string? Latitude { get; set; }
         public string? Longitude { get; set; }
         public string? Notes { get; set; }
+        public string? Description { get; set; }
+        public string? Proprietor { get; set; }
+        public string? Tenant { get; set; }
+        public string? Occupier { get; set; }
 
         public string Name
         {
@@ -36,6 +40,8 @@ namespace MapPlotter.Models
         public string IconName => HasGeo ? "MapPin" : "Question";
 
         public bool IsDirty { get; set; }
+
+        public bool IsOwnerOccupier => Occupier == "The Proprietor";
 
         public Residence Clone()
         {

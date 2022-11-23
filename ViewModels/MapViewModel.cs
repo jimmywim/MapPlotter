@@ -1,7 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using MapPlotter.Models;
-using MapPlotter.Services;
+using MapPlotter.Data;
 using Microsoft.Maps.MapControl.WPF;
 using Microsoft.Win32;
 using System;
@@ -16,11 +15,13 @@ namespace MapPlotter.ViewModels
 {
     public class MapViewModel : ObservableObject
     {
-        private string latitude;
-        public string Latitude { get => latitude; set => SetProperty(ref latitude, value); }
+        private readonly ResidencesContext context;
 
-        private string longitude;
-        public string Longitude { get => longitude; set => SetProperty(ref longitude, value); }
+        private long latitude;
+        public long Latitude { get => latitude; set => SetProperty(ref latitude, value); }
+
+        private long longitude;
+        public long Longitude { get => longitude; set => SetProperty(ref longitude, value); }
 
         private ObservableCollection<Pushpin> pins;
         public ObservableCollection<Pushpin> Pushpins { get => pins; set => SetProperty(ref pins, value); }
@@ -28,7 +29,8 @@ namespace MapPlotter.ViewModels
         private ObservableCollection<Residence> residences;
         public ObservableCollection<Residence> Residences
         {
-            get => residences; set
+            get => residences; 
+            set
             {
                 SetProperty(ref residences, value);
                 OnPropertyChanged(nameof(FilteredResidences));
@@ -136,6 +138,8 @@ namespace MapPlotter.ViewModels
             Pushpins = new ObservableCollection<Pushpin>();
             Residences = new ObservableCollection<Residence>();
             FilteredResidences = new ObservableCollection<Residence>();
+
+            context = new ResidencesContext();
         }
 
         private void ShowAll()
@@ -159,7 +163,6 @@ namespace MapPlotter.ViewModels
                 {
                     res.Latitude = EditedResidence.Latitude;
                     res.Longitude = EditedResidence.Longitude;
-                    res.IsDirty = true;
 
                     EditedResidence = null;
                     IsEditMode = false;
@@ -171,40 +174,22 @@ namespace MapPlotter.ViewModels
 
         public void CancelEditResidence()
         {
-            SelectedResidence.IsDirty = false;
             EditedResidence = null;
             IsEditMode = false;
         }
 
         private async Task LoadResidences()
         {
-            OpenFileDialog openFile = new OpenFileDialog();
-            {
-                if (openFile.ShowDialog() == true)
-                {
-                    ResidenceDataService residenceDataService = new ResidenceDataService(openFile.FileName);
-                    var res = await residenceDataService.LoadResidences();
-                    Residences = new ObservableCollection<Residence>(res);
-                    FilteredResidences = new ObservableCollection<Residence>(res);
+            Residences = new ObservableCollection<Residence>(context.Residences);
+            FilteredResidences = new ObservableCollection<Residence>(Residences);
 
-                    OnPropertyChanged(nameof(ResidencesLoaded));
-                    OnPropertyChanged(nameof(NumberInView));
-                }
-            }
+            OnPropertyChanged(nameof(ResidencesLoaded));
+            OnPropertyChanged(nameof(NumberInView));
         }
 
         private async Task SaveResidences()
         {
-            SaveFileDialog saveFile = new SaveFileDialog();
-            if (saveFile.ShowDialog() == true)
-            {
-                ResidenceDataService residenceDataService = new ResidenceDataService(saveFile.FileName);
-                var res = Residences.ToList();
-                await residenceDataService.SaveResidences(res);
-
-                res.ForEach(r => r.IsDirty = false);
-                Residences = new ObservableCollection<Residence>(res);
-            }
+            await context.SaveChangesAsync();
         }
 
         private List<Residence> FilterResidences(bool withLocation)

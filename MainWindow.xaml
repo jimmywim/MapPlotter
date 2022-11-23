@@ -54,7 +54,7 @@
             <StackPanel Orientation="Horizontal">
                 <StackPanel Orientation="Horizontal">
                     <Label>Notes:</Label>
-                    <TextBox Width="400" Text="{Binding SelectedResidence.Notes}" />
+                    <TextBox Width="400" Text="{Binding SelectedResidence.LocationNotes}" />
                 </StackPanel>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Margin="0 10">

@@ -1,5 +1,4 @@
-﻿using MapPlotter.Models;
-using MapPlotter.Services;
+﻿using MapPlotter.Data;
 using MapPlotter.ViewModels;
 using Microsoft.Maps.MapControl.WPF;
 using Microsoft.Win32;
@@ -43,8 +42,8 @@ namespace MapPlotter
             Point mousePosition = e.GetPosition(this);
             Location pinLocation = myMap.ViewportPointToLocation(mousePosition);
 
-            DataModel.Latitude = pinLocation.Latitude.ToString();
-            DataModel.Longitude = pinLocation.Longitude.ToString();
+            DataModel.Latitude = (long)pinLocation.Latitude;
+            DataModel.Longitude = (long)pinLocation.Longitude;
         }
 
         private void myMap_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -58,8 +57,8 @@ namespace MapPlotter
                 Pushpin pin = new Pushpin();
                 pin.Location = pinLocation;
 
-                DataModel.Latitude = pinLocation.Latitude.ToString();
-                DataModel.Longitude = pinLocation.Longitude.ToString();
+                DataModel.Latitude = (long)pinLocation.Latitude;
+                DataModel.Longitude = (long)pinLocation.Longitude;
 
                 DataModel.Pushpins.Clear();
                 DataModel.Pushpins.Add(pin);
@@ -67,7 +66,6 @@ namespace MapPlotter
                 // Modify Residence Coords
                 DataModel.EditedResidence.Latitude = DataModel.Latitude;
                 DataModel.EditedResidence.Longitude = DataModel.Longitude;
-                DataModel.EditedResidence.IsDirty = true;
             }
 
             //e.Handled = true;
@@ -93,8 +91,8 @@ namespace MapPlotter
             {
                 Pushpin pin = new Pushpin();
 
-                double lat = Double.Parse(residence.Latitude);
-                double lng = Double.Parse(residence.Longitude);
+                double lat = (double)residence.Latitude;
+                double lng = (double)residence.Longitude;
                 pin.Location = new Location(lat, lng);
 
                 if (residence.IsOwnerOccupier)

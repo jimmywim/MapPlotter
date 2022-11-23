@@ -107,6 +107,8 @@ namespace MapPlotter
                     Content = residence.Name
                 };
 
+                pin.Content = residence.Number;
+
                 if (clearFirst)
                 {
                     DataModel.Pushpins.Clear();
@@ -153,10 +155,26 @@ namespace MapPlotter
 
         private void ShowAllOnMapButton_Click(object sender, RoutedEventArgs e)
         {
+            DataModel.Pushpins.Clear();
+
             foreach(var residence in DataModel.FilteredResidences)
             {
                 CreatePushPin(residence, false);
             }
+
+            SetMapView();
+        }
+
+        private void SetMapView()
+        {
+            //Margin
+            var w = new Pushpin().Width;
+            var h = new Pushpin().Height;
+            var margin = new Thickness(w / 2, h, w / 2, 0);
+
+            var locations = DataModel.Pushpins.Where(p => p.Location.Latitude > 0).Select(p => p.Location);
+
+            myMap.SetView(locations, margin, 0);
         }
     }
 }

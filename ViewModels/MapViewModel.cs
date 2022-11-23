@@ -40,21 +40,13 @@ namespace MapPlotter.ViewModels
         private string filterText;
         public string FilterText
         {
-            get => filterText;
+            get => filterText ?? string.Empty;
             set
             {
                 SetProperty(ref filterText, value);
 
-                if (!string.IsNullOrEmpty(value))
-                {
-                    var filtered = Residences.Where(r => r.Address.ToLower().Contains(value.ToLower()));
-                    FilteredResidences = new ObservableCollection<Residence>(filtered);
-                }
-                else
-                {
-                    FilteredResidences = new ObservableCollection<Residence>(Residences);
-                }
-
+                var filtered = FilterResidences(FilterUnassigned);
+                FilteredResidences = new ObservableCollection<Residence>(filtered);
 
                 OnPropertyChanged(nameof(NumberInView));
             }
@@ -66,7 +58,7 @@ namespace MapPlotter.ViewModels
             get => filterUnassigned;
             set
             {
-                var filtered = Residences.Where(r => r.HasGeo == value);
+                var filtered = FilterResidences(value);
                 FilteredResidences = new ObservableCollection<Residence>(filtered);
                 SetProperty(ref filterUnassigned, value);
                 OnPropertyChanged(nameof(NumberInView));
@@ -213,6 +205,17 @@ namespace MapPlotter.ViewModels
                 res.ForEach(r => r.IsDirty = false);
                 Residences = new ObservableCollection<Residence>(res);
             }
+        }
+
+        private List<Residence> FilterResidences(bool withLocation)
+        {
+            List<Residence> residences = Residences.Where(r => r.HasGeo == withLocation).ToList();
+            if (!string.IsNullOrEmpty(FilterText))
+            {
+                residences = residences.Where(r => r.Name.ToLower().Contains(FilterText.ToLower())).ToList();
+            }
+
+            return residences;
         }
     }
 }

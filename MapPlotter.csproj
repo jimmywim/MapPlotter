@@ -45,4 +45,12 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <EditorConfigFiles Remove="C:\git\MapPlotter\Data\.editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="C:\git\MapPlotter\Data\.editorconfig" />
+  </ItemGroup>
+
 </Project>

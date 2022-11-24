@@ -14,6 +14,13 @@ using System.Windows.Input;
 
 namespace MapPlotter.ViewModels
 {
+    internal enum LocationFilterMode
+    {
+        All,
+        LocationSet,
+        NoLocationSet
+    }
+
     public class MapViewModel : ObservableObject
     {
         private readonly ResidencesContext context;
@@ -48,22 +55,58 @@ namespace MapPlotter.ViewModels
             {
                 SetProperty(ref filterText, value);
 
-                var filtered = FilterResidences(FilterUnassigned);
+                var filtered = FilterResidences(filterMode);
                 FilteredResidences = new ObservableCollection<Residence>(filtered);
 
                 OnPropertyChanged(nameof(NumberInView));
             }
         }
 
-        private bool filterUnassigned;
-        public bool FilterUnassigned
+        private LocationFilterMode filterMode;
+        public bool FilterLocationsAssigned
         {
-            get => filterUnassigned;
+            get => filterMode == LocationFilterMode.LocationSet;
             set
             {
-                var filtered = FilterResidences(value);
+                filterMode = LocationFilterMode.LocationSet;
+                OnPropertyChanged(nameof(FilterLocationsUnassigned));
+                OnPropertyChanged(nameof(FilterLocationsAll));
+
+                var filtered = FilterResidences(filterMode);
                 FilteredResidences = new ObservableCollection<Residence>(filtered);
-                SetProperty(ref filterUnassigned, value);
+
+                OnPropertyChanged(nameof(NumberInView));
+            }
+        }
+
+        public bool FilterLocationsUnassigned
+        {
+            get => filterMode == LocationFilterMode.NoLocationSet;
+            set
+            {
+                filterMode = LocationFilterMode.NoLocationSet;
+                OnPropertyChanged(nameof(FilterLocationsAssigned));
+                OnPropertyChanged(nameof(FilterLocationsAll));
+
+                var filtered = FilterResidences(filterMode);
+                FilteredResidences = new ObservableCollection<Residence>(filtered);
+
+                OnPropertyChanged(nameof(NumberInView));
+            }
+        }
+
+        public bool FilterLocationsAll
+        {
+            get => filterMode == LocationFilterMode.All;
+            set
+            {
+                filterMode = LocationFilterMode.All;
+                OnPropertyChanged(nameof(FilterLocationsAssigned));
+                OnPropertyChanged(nameof(FilterLocationsUnassigned));
+
+                var filtered = FilterResidences(filterMode);
+                FilteredResidences = new ObservableCollection<Residence>(filtered);
+
                 OnPropertyChanged(nameof(NumberInView));
             }
         }
@@ -202,7 +245,12 @@ namespace MapPlotter.ViewModels
                 .OrderBy(r => r.Address).ThenBy(r => r.Number)
                 .Include(r => r.ResidenceLocations);
 
-            Residences = new ObservableCollection<Residence>(dbResidences);
+            // Can't parse & sort on the EF query, so do it on the hydrated result
+            var sorted = dbResidences.ToList()
+                .OrderBy(r => r.Address)
+                .ThenBy(r => !string.IsNullOrEmpty(r.Number) ? double.Parse(r.Number) : 0);
+
+            Residences = new ObservableCollection<Residence>(sorted);
             FilteredResidences = new ObservableCollection<Residence>(Residences);
 
             OnPropertyChanged(nameof(ResidencesLoaded));
@@ -214,9 +262,19 @@ namespace MapPlotter.ViewModels
             await context.SaveChangesAsync();
         }
 
-        private List<Residence> FilterResidences(bool withLocation)
+        private IEnumerable<Residence> FilterResidences(LocationFilterMode filterMode)
         {
-            List<Residence> residences = Residences.Where(r => r.HasGeo == withLocation).ToList();
+            IEnumerable<Residence> residences = Residences.AsQueryable();
+            switch(filterMode)
+            {
+                case LocationFilterMode.LocationSet:
+                    residences = residences.Where(r => r.HasGeo == true);
+                    break;
+                case LocationFilterMode.NoLocationSet:
+                    residences = residences.Where(r => r.HasGeo == false);
+                    break;
+            }
+          
             if (!string.IsNullOrEmpty(FilterText))
             {
                 residences = residences.Where(r => r.Name.ToLower().Contains(FilterText.ToLower())).ToList();

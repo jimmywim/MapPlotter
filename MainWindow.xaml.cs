@@ -24,7 +24,7 @@ namespace MapPlotter
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
-    { 
+    {
         public MapViewModel DataModel
         {
             get => DataContext as MapViewModel;
@@ -32,7 +32,7 @@ namespace MapPlotter
         public MainWindow()
         {
             InitializeComponent();
-            
+
         }
 
         private void myMap_MouseMove(object sender, MouseEventArgs e)
@@ -95,7 +95,7 @@ namespace MapPlotter
 
                     CreatePushPin(item);
                 }
-            }          
+            }
         }
 
         private void CreatePushPin(Residence residence, bool clearFirst = true)
@@ -152,7 +152,7 @@ namespace MapPlotter
 
                 CreatePushPin(DataModel.SelectedResidence);
             }
-            
+
         }
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
@@ -161,14 +161,14 @@ namespace MapPlotter
             {
                 EditButton.Content = "Edit";
                 DataModel.SaveEditedResidence();
-            }          
+            }
         }
 
         private void ShowAllOnMapButton_Click(object sender, RoutedEventArgs e)
         {
             DataModel.Pushpins.Clear();
 
-            foreach(var residence in DataModel.FilteredResidences)
+            foreach (var residence in DataModel.FilteredResidences)
             {
                 CreatePushPin(residence, false);
             }
@@ -184,13 +184,15 @@ namespace MapPlotter
             var margin = new Thickness(w / 2, h, w / 2, 0);
 
             var locations = DataModel.Pushpins.Where(p => p.Location.Latitude > 0).Select(p => p.Location);
-
-            myMap.SetView(locations, margin, 0);
+            if (locations.Any())
+            {
+                myMap.SetView(locations, margin, 0);
+            }
         }
 
         private async void RemoveButton_Click(object sender, RoutedEventArgs e)
         {
-            if(MessageBox.Show("Are you sure?", "Delete Point", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+            if (MessageBox.Show("Are you sure?", "Delete Point", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
             {
                 DataModel.RemoveLocation().ConfigureAwait(false).GetAwaiter();
             }

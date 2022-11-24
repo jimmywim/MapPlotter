@@ -11,12 +11,6 @@ public partial class Residence
 
     public string? Number { get; set; }
 
-    public long? Latitude { get; set; }
-
-    public long? Longitude { get; set; }
-
-    public string? LocationNotes { get; set; }
-
     public string? Vrnumber { get; set; }
 
     public string? Vrdescription { get; set; }
@@ -46,4 +40,6 @@ public partial class Residence
     public long? VryearlyRentd { get; set; }
 
     public long? VryearlyRents { get; set; }
+
+    public virtual ICollection<ResidenceLocation> ResidenceLocations { get; } = new List<ResidenceLocation>();
 }

@@ -57,15 +57,28 @@ namespace MapPlotter
                 Pushpin pin = new Pushpin();
                 pin.Location = pinLocation;
 
-                DataModel.Latitude = (long)pinLocation.Latitude;
-                DataModel.Longitude = (long)pinLocation.Longitude;
+                DataModel.Latitude = pinLocation.Latitude;
+                DataModel.Longitude = pinLocation.Longitude;
 
                 DataModel.Pushpins.Clear();
                 DataModel.Pushpins.Add(pin);
 
                 // Modify Residence Coords
-                DataModel.EditedResidence.Latitude = DataModel.Latitude;
-                DataModel.EditedResidence.Longitude = DataModel.Longitude;
+                var editedResidence = DataModel.EditedResidence;
+                if (editedResidence.HasGeo)
+                {
+                    var location = editedResidence.ResidenceLocations.First();
+                    location.Latitude = DataModel.Latitude;
+                    location.Longitude = DataModel.Longitude;
+                }
+                else
+                {
+                    editedResidence.ResidenceLocations.Add(new ResidenceLocation
+                    {
+                        Latitude = DataModel.Latitude,
+                        Longitude = DataModel.Longitude,
+                    });
+                }
             }
 
             //e.Handled = true;
@@ -91,8 +104,8 @@ namespace MapPlotter
             {
                 Pushpin pin = new Pushpin();
 
-                double lat = (double)residence.Latitude;
-                double lng = (double)residence.Longitude;
+                double lat = (double)residence.Location.Latitude;
+                double lng = (double)residence.Location.Longitude;
                 pin.Location = new Location(lat, lng);
 
                 if (residence.IsOwnerOccupier)

@@ -37,7 +37,10 @@ namespace MapPlotter.Data
         }
 
         [NotMapped]
-        public bool HasGeo => (Latitude.HasValue && Latitude != 0) && (Longitude.HasValue && Longitude != 0);
+        public bool HasGeo => ResidenceLocations != null && ResidenceLocations.Count > 0;
+
+        [NotMapped]
+        public ResidenceLocation Location => ResidenceLocations.FirstOrDefault();
 
         [NotMapped]
         public string IconName => HasGeo ? "MapPin" : "Question";

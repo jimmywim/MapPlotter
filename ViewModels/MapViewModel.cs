@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MapPlotter.Data;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Maps.MapControl.WPF;
 using Microsoft.Win32;
 using System;
@@ -17,11 +18,11 @@ namespace MapPlotter.ViewModels
     {
         private readonly ResidencesContext context;
 
-        private long latitude;
-        public long Latitude { get => latitude; set => SetProperty(ref latitude, value); }
+        private double latitude;
+        public double Latitude { get => latitude; set => SetProperty(ref latitude, value); }
 
-        private long longitude;
-        public long Longitude { get => longitude; set => SetProperty(ref longitude, value); }
+        private double longitude;
+        public double Longitude { get => longitude; set => SetProperty(ref longitude, value); }
 
         private ObservableCollection<Pushpin> pins;
         public ObservableCollection<Pushpin> Pushpins { get => pins; set => SetProperty(ref pins, value); }
@@ -154,20 +155,22 @@ namespace MapPlotter.ViewModels
             EditedResidence = SelectedResidence.Clone();
         }
 
-        public void SaveEditedResidence()
+        public async Task SaveEditedResidence()
         {
             if (EditedResidence != null)
             {
                 var res = Residences.FirstOrDefault(r => r.PrimaryKey == EditedResidence.PrimaryKey);
                 if (res != null)
                 {
-                    res.Latitude = EditedResidence.Latitude;
-                    res.Longitude = EditedResidence.Longitude;
+                    res.Location.Latitude = EditedResidence.Location.Latitude;
+                    res.Location.Longitude = EditedResidence.Location.Longitude;
 
                     EditedResidence = null;
                     IsEditMode = false;
 
                     OnPropertyChanged(nameof(SelectedResidence));
+
+                    await SaveResidences();
                 }
             }
         }
@@ -180,7 +183,11 @@ namespace MapPlotter.ViewModels
 
         private async Task LoadResidences()
         {
-            Residences = new ObservableCollection<Residence>(context.Residences);
+            var dbResidences = context.Residences
+                .OrderBy(r => r.Address).ThenBy(r => r.Number)
+                .Include(r => r.ResidenceLocations);
+
+            Residences = new ObservableCollection<Residence>(dbResidences);
             FilteredResidences = new ObservableCollection<Residence>(Residences);
 
             OnPropertyChanged(nameof(ResidencesLoaded));

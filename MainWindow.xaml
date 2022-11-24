@@ -38,12 +38,12 @@
             <StackPanel Orientation="Horizontal">
                 <StackPanel Orientation="Horizontal" Width="150">
                     <Label>X:</Label>
-                    <Label Content="{Binding Latitude}" />
+                    <Label Content="{Binding SelectedResidence.Location.Latitude}" />
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal"  Width="150">
                     <Label>Y:</Label>
-                    <Label Content="{Binding Longitude}" />
+                    <Label Content="{Binding SelectedResidence.Location.Longitude}" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Width="350">
                     <Label>Name:</Label>
@@ -54,7 +54,7 @@
             <StackPanel Orientation="Horizontal">
                 <StackPanel Orientation="Horizontal">
                     <Label>Notes:</Label>
-                    <TextBox Width="400" Text="{Binding SelectedResidence.LocationNotes}" />
+                    <TextBox Width="400" Text="{Binding SelectedResidence.Location.LocationNotes}" />
                 </StackPanel>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Margin="0 10">

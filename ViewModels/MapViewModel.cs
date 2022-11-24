@@ -251,6 +251,7 @@ namespace MapPlotter.ViewModels
                         res.Location.Latitude = EditedResidence.Location.Latitude;
                         res.Location.Longitude = EditedResidence.Location.Longitude;
                         res.IsSpeculative = EditedResidence.IsSpeculative;
+                        res.Location.LocationNotes = EditedResidence.Location.LocationNotes;
                     }
 
                     EditedResidence = null;

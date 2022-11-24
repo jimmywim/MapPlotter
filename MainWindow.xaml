@@ -18,14 +18,14 @@
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
-            <RowDefinition Height="100" />
+            <RowDefinition Height="140" />
         </Grid.RowDefinitions>
 
         <m:Map x:Name="myMap"
                Grid.Column="1"
                CredentialsProvider="ArwKvTnZWuGMxz3SP0uwSUoEQQwRFHFWnUONaJhsaM_Eu_jxCV7p08To1gN3z1--"
                ZoomLevel="17"
-              
+               Culture="en-gb"
                MouseLeftButtonDown="myMap_MouseLeftButtonDown"
                Mode="Aerial">
             <m:Map.Center>
@@ -54,7 +54,7 @@
             <StackPanel Orientation="Horizontal">
                 <StackPanel Orientation="Horizontal">
                     <Label>Notes:</Label>
-                    <TextBox Width="400" Text="{Binding SelectedResidence.Location.LocationNotes}" />
+                    <TextBox Height="36" VerticalScrollBarVisibility="Auto" TextWrapping="Wrap" Width="400" Text="{Binding SelectedResidence.Location.LocationNotes}" />
                     <CheckBox Content="Speculative" IsChecked="{Binding IsSpeculative}" Margin="10 0" VerticalAlignment="Center" />
                 </StackPanel>
             </StackPanel>

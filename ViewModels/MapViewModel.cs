@@ -31,6 +31,27 @@ namespace MapPlotter.ViewModels
         private double longitude;
         public double Longitude { get => longitude; set => SetProperty(ref longitude, value); }
 
+        public bool IsSpeculative
+        {
+            get
+            {
+                if (SelectedResidence?.Location != null)
+                {
+                    return SelectedResidence.IsSpeculative;
+                }
+                return false;
+            }
+            set
+            {
+                if (EditedResidence?.Location != null)
+                {
+                    EditedResidence.IsSpeculative = value;
+                }
+
+                UpdateUIForResidence();
+            }
+        }
+
         private ObservableCollection<Pushpin> pins;
         public ObservableCollection<Pushpin> Pushpins { get => pins; set => SetProperty(ref pins, value); }
 
@@ -124,7 +145,7 @@ namespace MapPlotter.ViewModels
             set
             {
                 SetProperty(ref selectedResidence, value);
-                OnPropertyChanged(nameof(CanEditResidence));
+                UpdateUIForResidence();
             }
         }
         public bool CanEditResidence => SelectedResidence != null;
@@ -133,7 +154,15 @@ namespace MapPlotter.ViewModels
         public bool IsEditMode { get => isEditMode; set => SetProperty(ref isEditMode, value); }
 
         private Residence? editedResidence;
-        public Residence? EditedResidence { get => editedResidence; set => SetProperty(ref editedResidence, value); }
+        public Residence? EditedResidence
+        {
+            get => editedResidence; 
+            set
+            {
+                SetProperty(ref editedResidence, value);
+                UpdateUIForResidence();
+            }
+        }
 
         private ICommand loadResidencesCommand;
         public ICommand LoadResidencesCommand
@@ -200,14 +229,14 @@ namespace MapPlotter.ViewModels
 
         public async Task RemoveLocation()
         {
-            if(EditedResidence != null && EditedResidence.Location != null)
+            if (EditedResidence != null && EditedResidence.Location != null)
             {
                 context.ResidenceLocations.Remove(EditedResidence.Location);
                 await context.SaveChangesAsync();
 
                 EditedResidence = null;
                 Pushpins.Clear();
-            }          
+            }
         }
 
         public async Task SaveEditedResidence()
@@ -221,6 +250,7 @@ namespace MapPlotter.ViewModels
                     {
                         res.Location.Latitude = EditedResidence.Location.Latitude;
                         res.Location.Longitude = EditedResidence.Location.Longitude;
+                        res.IsSpeculative = EditedResidence.IsSpeculative;
                     }
 
                     EditedResidence = null;
@@ -237,6 +267,12 @@ namespace MapPlotter.ViewModels
         {
             EditedResidence = null;
             IsEditMode = false;
+        }
+
+        private void UpdateUIForResidence()
+        {
+            OnPropertyChanged(nameof(IsSpeculative));
+            OnPropertyChanged(nameof(CanEditResidence));
         }
 
         private async Task LoadResidences()
@@ -265,7 +301,7 @@ namespace MapPlotter.ViewModels
         private IEnumerable<Residence> FilterResidences(LocationFilterMode filterMode)
         {
             IEnumerable<Residence> residences = Residences.AsQueryable();
-            switch(filterMode)
+            switch (filterMode)
             {
                 case LocationFilterMode.LocationSet:
                     residences = residences.Where(r => r.HasGeo == true);
@@ -274,7 +310,7 @@ namespace MapPlotter.ViewModels
                     residences = residences.Where(r => r.HasGeo == false);
                     break;
             }
-          
+
             if (!string.IsNullOrEmpty(FilterText))
             {
                 residences = residences.Where(r => r.Name.ToLower().Contains(FilterText.ToLower())).ToList();

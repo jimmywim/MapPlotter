@@ -55,6 +55,7 @@
                 <StackPanel Orientation="Horizontal">
                     <Label>Notes:</Label>
                     <TextBox Width="400" Text="{Binding SelectedResidence.Location.LocationNotes}" />
+                    <CheckBox Content="Speculative" IsChecked="{Binding IsSpeculative}" Margin="10 0" VerticalAlignment="Center" />
                 </StackPanel>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Margin="0 10">

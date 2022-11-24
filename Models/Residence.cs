@@ -48,6 +48,19 @@ namespace MapPlotter.Data
         [NotMapped]
         public bool IsOwnerOccupier => Occupier == "The Proprietor";
 
+        [NotMapped]
+        public bool IsSpeculative
+        {
+            get => Location?.Speculative == 1;
+            set
+            {
+                if (Location != null)
+                {
+                    Location.Speculative = value ? 1 : 0;
+                }
+            }
+        }
+
         public Residence Clone()
         {
             Residence clone = MemberwiseClone() as Residence;

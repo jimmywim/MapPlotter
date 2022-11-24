@@ -15,5 +15,7 @@ public partial class ResidenceLocation
 
     public string? LocationNotes { get; set; }
 
+    public long? Speculative { get; set; }
+
     public virtual Residence Residence { get; set; } = null!;
 }

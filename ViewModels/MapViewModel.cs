@@ -30,7 +30,7 @@ namespace MapPlotter.ViewModels
         private ObservableCollection<Residence> residences;
         public ObservableCollection<Residence> Residences
         {
-            get => residences; 
+            get => residences;
             set
             {
                 SetProperty(ref residences, value);
@@ -155,6 +155,18 @@ namespace MapPlotter.ViewModels
             EditedResidence = SelectedResidence.Clone();
         }
 
+        public async Task RemoveLocation()
+        {
+            if(EditedResidence != null && EditedResidence.Location != null)
+            {
+                context.ResidenceLocations.Remove(EditedResidence.Location);
+                await context.SaveChangesAsync();
+
+                EditedResidence = null;
+                Pushpins.Clear();
+            }          
+        }
+
         public async Task SaveEditedResidence()
         {
             if (EditedResidence != null)
@@ -162,8 +174,11 @@ namespace MapPlotter.ViewModels
                 var res = Residences.FirstOrDefault(r => r.PrimaryKey == EditedResidence.PrimaryKey);
                 if (res != null)
                 {
-                    res.Location.Latitude = EditedResidence.Location.Latitude;
-                    res.Location.Longitude = EditedResidence.Location.Longitude;
+                    if (res.Location != null)
+                    {
+                        res.Location.Latitude = EditedResidence.Location.Latitude;
+                        res.Location.Longitude = EditedResidence.Location.Longitude;
+                    }
 
                     EditedResidence = null;
                     IsEditMode = false;

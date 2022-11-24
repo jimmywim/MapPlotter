@@ -60,6 +60,7 @@
             <StackPanel Orientation="Horizontal" Margin="0 10">
                 <Button x:Name="EditButton" Padding="10 5" Margin="10 0" Click="EditButton_Click" IsEnabled="{Binding CanEditResidence}">Edit</Button>
                 <Button x:Name="SaveButton" Padding="10 5" Margin="10 0" Click="SaveButton_Click" IsEnabled="{Binding IsEditMode}">Save</Button>
+                <Button x:Name="RemoveButton" Padding="10 5" Margin="10 0" Click="RemoveButton_Click" IsEnabled="{Binding IsEditMode}">Remove</Button>
             </StackPanel>
         </StackPanel>
 

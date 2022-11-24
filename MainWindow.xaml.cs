@@ -187,5 +187,13 @@ namespace MapPlotter
 
             myMap.SetView(locations, margin, 0);
         }
+
+        private async void RemoveButton_Click(object sender, RoutedEventArgs e)
+        {
+            if(MessageBox.Show("Are you sure?", "Delete Point", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+            {
+                DataModel.RemoveLocation().ConfigureAwait(false).GetAwaiter();
+            }
+        }
     }
 }
